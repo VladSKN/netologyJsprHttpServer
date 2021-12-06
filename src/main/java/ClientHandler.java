@@ -69,6 +69,7 @@ public class ClientHandler implements Runnable {
                 out.write(okMassage(mimeType, length).getBytes());
                 Files.copy(filePath, out);
                 out.flush();
+                System.out.println("Bla bla bla");
             }
         } catch (IOException e) {
             e.printStackTrace();
