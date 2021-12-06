@@ -8,10 +8,11 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
     private final int PORT = 9999;
+    private final int N_THREAD = 64;
     private final BlockingQueue<ClientHandler> clients = new LinkedBlockingQueue<>();
 
     public void start() {
-        ExecutorService pool = Executors.newFixedThreadPool(64);
+        ExecutorService pool = Executors.newFixedThreadPool(N_THREAD);
         try (final var serverSocket = new ServerSocket(PORT)) {
             while (true) {
                 final var socket = serverSocket.accept();
