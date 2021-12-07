@@ -29,6 +29,7 @@ public class ClientHandler implements Runnable {
                 // read only request line for simplicity
                 // must be in form GET /path HTTP/1.1
                 final var requestLine = in.readLine();
+                System.out.println(requestLine);
                 final var parts = requestLine.split(" ");
 
                 if (parts.length != 3) {
