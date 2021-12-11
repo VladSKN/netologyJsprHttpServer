@@ -1,15 +1,16 @@
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 
 public class Server {
-    private final int PORT = 9999;
+    private final int PORT;
     private final int N_THREAD = 64;
-    private final BlockingQueue<ClientHandler> clients = new LinkedBlockingQueue<>();
+
+    public Server(int PORT) {
+        this.PORT = PORT;
+    }
 
     public void start() {
         ExecutorService pool = Executors.newFixedThreadPool(N_THREAD);
@@ -17,7 +18,6 @@ public class Server {
             while (true) {
                 final var socket = serverSocket.accept();
                 ClientHandler client = new ClientHandler(socket);
-                clients.add(client);
                 pool.execute(client);
             }
         } catch (IOException ex) {

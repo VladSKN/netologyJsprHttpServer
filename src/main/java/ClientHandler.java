@@ -1,3 +1,4 @@
+import javax.swing.plaf.IconUIResource;
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -20,21 +21,17 @@ public class ClientHandler implements Runnable {
     public void run() {
         final var validPaths = List.of("/index.html", "/spring.svg", "/spring.png", "/resources.html",
                 "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
+
         try (
                 final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 final var out = new BufferedOutputStream(socket.getOutputStream());
         ) {
             while (true) {
-
-                // read only request line for simplicity
-                // must be in form GET /path HTTP/1.1
                 final var requestLine = in.readLine();
-                System.out.println(requestLine);
                 final var parts = requestLine.split(" ");
 
                 if (parts.length != 3) {
-                    // just close socket
-                    continue;
+                    break;
                 }
 
                 final var path = parts[1];
@@ -47,7 +44,6 @@ public class ClientHandler implements Runnable {
                 final var filePath = Path.of(".", "public", path);
                 final var mimeType = Files.probeContentType(filePath);
 
-                // special case for classic
                 if (path.equals("/classic.html")) {
                     final var template = Files.readString(filePath);
                     final var content = template.replace(
@@ -76,14 +72,14 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    private String errorMessage(){
+    private String errorMessage() {
         return "HTTP/1.1 404 Not Found\r\n" +
-                        "Content-Length: 0\r\n" +
-                        "Connection: close\r\n" +
-                        "\r\n";
+                "Content-Length: 0\r\n" +
+                "Connection: close\r\n" +
+                "\r\n";
     }
 
-    private String okMassage(String mimeType, long length){
+    private String okMassage(String mimeType, long length) {
         return "HTTP/1.1 200 OK\r\n" +
                 "Content-Type: " + mimeType + "\r\n" +
                 "Content-Length: " + length + "\r\n" +
