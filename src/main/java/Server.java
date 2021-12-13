@@ -14,6 +14,17 @@ public class Server {
             "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
     private final ExecutorService executorService;
     private final Map<String, Map<String, Handler>> handlers;
+    private final Handler handlerNotFound = ((request, bufferedOutputStream) -> {
+        bufferedOutputStream.write((
+                "HTTP/1.1 404 Not Found\r\n" +
+                        "Content-Length: 0\r\n" +
+                        "Connection: close\r\n" +
+                        "\r\n"
+        ).getBytes());
+        bufferedOutputStream.flush();
+    });
+
+
 
     public Server(int nThreads) {
         this.executorService = Executors.newFixedThreadPool(nThreads);
@@ -50,22 +61,12 @@ public class Server {
             Request request = Request.fromInputStream(in);
             Map<String, Handler> handlerMap = handlers.get(request.getMethod());
             if (handlerMap == null) {
-                out.write((
-                        "HTTP/1.1 404 Not Found\r\n" +
-                                "Content-Length: 0\r\n" +
-                                "Connection: close\r\n" +
-                                "\r\n"
-                ).getBytes());
+                handlerNotFound.handle(request, out);
                 return;
             }
             Handler handler = handlerMap.get(request.getPath());
             if (handler == null) {
-                out.write((
-                        "HTTP/1.1 404 Not Found\r\n" +
-                                "Content-Length: 0\r\n" +
-                                "Connection: close\r\n" +
-                                "\r\n"
-                ).getBytes());
+                handlerNotFound.handle(request, out);
                 return;
             }
             handler.handle(request, out);
