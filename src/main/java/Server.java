@@ -17,8 +17,6 @@ public class Server {
     private final int PORT;
     private final int N_THREAD;
     private final Map<String, Map<String, Handler>> handlers;
-    private final List<String> validPaths = List.of("/index.html", "/spring.svg", "/spring.png", "/resources.html",
-            "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
 
     public Server(int PORT, int N_THREAD) {
         this.N_THREAD = N_THREAD;
