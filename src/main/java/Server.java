@@ -1,24 +1,30 @@
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Server {
 
-    private final int PORT;
+
     private final int N_THREAD;
 
-    public Server(int PORT, int N_THREAD) {
-        this.N_THREAD = N_THREAD;
-        this.PORT = PORT;
+    public Server(int n_THREAD) {
+        N_THREAD = n_THREAD;
     }
 
-    public void start() {
+    public void start(int port) {
         ExecutorService pool = Executors.newFixedThreadPool(N_THREAD);
-        try {
-                ClientHandler client = new ClientHandler(PORT);
-                pool.execute(client);
-        } finally {
-            pool.shutdown();
+
+        try (final var serverSocket = new ServerSocket(port)) {
+            while (true) {
+                final var socket = serverSocket.accept();
+                ClientHandler clientHandler = new ClientHandler(socket);
+                pool.execute(clientHandler);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
+
