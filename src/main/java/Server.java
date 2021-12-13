@@ -2,10 +2,10 @@
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -33,34 +33,46 @@ public class Server {
 
     public void start() {
         ExecutorService pool = Executors.newFixedThreadPool(N_THREAD);
-        try {
-            Runnable runnable = () -> {
-                try (final var serverSocket = new ServerSocket(PORT)) {
-                    while (true) {
-                        try (final var socket = serverSocket.accept();
-                             final var in = socket.getInputStream();
-                             final var out = new BufferedOutputStream(socket.getOutputStream());
-                        ) {
 
-                            Request request = Request.fromInputStream(in);
-                            Map<String, Handler> handlerMap = handlers.get(request.getPath());
-                            if (handlerMap == null) {
-                                //TODO 404 error
-                                return;
-                            }
+        try (final var serverSocket = new ServerSocket(PORT)) {
+            while (true) {
+                final var socket = serverSocket.accept();
+                Runnable runnable = () -> run(socket);
+                pool.execute(runnable);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            pool.shutdown();
+        }
+    }
 
-                            Handler handler = handlerMap.get(request.getPath());
-                            if (handler == null) {
-                                //TODO 404 error
-                                return;
-                            }
-                            handler.handle(request, out);
+    private void run(Socket socket) {
 
-//                    final var path = request.getPath();
+        try (socket;
+             final var in = socket.getInputStream();
+             final var out = new BufferedOutputStream(socket.getOutputStream());
+        ) {
+
+            Request request = Request.fromInputStream(in);
+            Map<String, Handler> handlerMap = handlers.get(request.getPath());
+            if (handlerMap == null) {
+                //TODO 404 error
+                return;
+            }
+
+            Handler handler = handlerMap.get(request.getPath());
+            if (handler == null) {
+                //TODO 404 error
+                return;
+            }
+            handler.handle(request, out);
+
+//                   final var path = request.getPath();
 //                    if (!validPaths.contains(path)) {
 //                        out.write((errorMessage()).getBytes());
 //                        out.flush();
-//                        continue;
+//                        return;
 //                    }
 //
 //                    final var filePath = Path.of(".", "public", path);
@@ -82,22 +94,21 @@ public class Server {
 //                        ).getBytes());
 //                        out.write(content);
 //                        out.flush();
-//                        continue;
+//                        return;
 //                    }
 //
 //                    final var length = Files.size(filePath);
-//                    out.write(okMassage(mimeType, length).getBytes());
+//                    out.write((
+//                            "HTTP/1.1 200 OK\r\n" +
+//                                    "Content-Type: " + mimeType + "\r\n" +
+//                                    "Content-Length: " + length + "\r\n" +
+//                                    "Connection: close\r\n" +
+//                                    "\r\n"
+//                    ).getBytes());
 //                    Files.copy(filePath, out);
 //                    out.flush();
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            };
-            pool.execute(runnable);
-        } finally {
-            pool.shutdown();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
