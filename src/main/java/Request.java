@@ -37,13 +37,12 @@ public class Request {
     public static Request fromInputStream(InputStream inputStream) throws IOException {
 
         final var in = new BufferedReader(new InputStreamReader(inputStream));
-        // read only request line for simplicity
-        // must be in form GET /path HTTP/1.1
+
         final var requestLine = in.readLine();
         final var parts = requestLine.split(" ");
 
         if (parts.length != 3) {
-           throw new IOException("Invalid Request!");
+            throw new IOException("Invalid Request!");
         }
         String method = parts[0];
         String path = parts[1];
@@ -52,7 +51,7 @@ public class Request {
 
         String line;
 
-        while(!(line = in.readLine()).isEmpty()){
+        while (!(line = in.readLine()).isEmpty()) {
             int i = line.indexOf(":");
             String name = line.substring(0, i);
             String value = line.substring(i + 2);
