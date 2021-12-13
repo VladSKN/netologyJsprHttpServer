@@ -10,8 +10,6 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private static final List<String> VALID_PATH = List.of("/index.html", "/spring.svg", "/spring.png", "/resources.html",
-            "/styles.css", "/app.js", "/links.html", "/forms.html", "/classic.html", "/events.html", "/events.js");
     private final ExecutorService executorService;
     private final Map<String, Map<String, Handler>> handlers;
     private final Handler handlerNotFound = ((request, bufferedOutputStream) -> {
