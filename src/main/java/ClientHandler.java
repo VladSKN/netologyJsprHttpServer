@@ -1,8 +1,14 @@
+import org.apache.http.NameValuePair;
+import org.apache.http.client.utils.URLEncodedUtils;
+
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
@@ -36,18 +42,23 @@ public class ClientHandler implements Runnable {
                 return;
             }
 
-            final var path = parts[1];
-            if (!VALID_PATH.contains(path)) {
+            // доработка функциональности поиска handler'а так, чтобы учитывался только путь без Query
+            final var pathWithoutQuery = parts[1].substring(0, parts[1].indexOf("?"));
+
+            // параметры из Query String, согласно документации возвращает List<NameValuePair>
+            System.out.println(getQueryParams(parts[1]));
+
+            if (!VALID_PATH.contains(pathWithoutQuery)) {
                 out.write(errorMessage().getBytes());
                 out.flush();
                 return;
             }
 
-            final var filePath = Path.of(".", "public", path);
+            final var filePath = Path.of(".", "public", pathWithoutQuery);
             final var mimeType = Files.probeContentType(filePath);
 
             // special case for classic
-            if (path.equals("/classic.html")) {
+            if (pathWithoutQuery.equals("/classic.html".substring(0, parts[1].indexOf("?")))) {
                 final var template = Files.readString(filePath);
                 final var content = template.replace(
                         "{time}",
@@ -69,9 +80,13 @@ public class ClientHandler implements Runnable {
             out.write(okMassage(mimeType, length).getBytes());
             Files.copy(filePath, out);
             out.flush();
-        } catch (IOException e) {
+        } catch (IOException | URISyntaxException e) {
             e.printStackTrace();
         }
+    }
+
+    private static List<NameValuePair> getQueryParams(String uri) throws URISyntaxException {
+        return URLEncodedUtils.parse(new URI(uri), StandardCharsets.UTF_8);
     }
 
     private String errorMessage() {
