@@ -45,7 +45,6 @@ public class ClientHandler implements Runnable {
             // доработка функциональности поиска handler'а так, чтобы учитывался только путь без Query
             final var pathWithoutQuery = parts[1].substring(0, parts[1].indexOf("?"));
 
-            // параметры из Query String, согласно документации возвращает List<NameValuePair>
             System.out.println(getQueryParams(parts[1]));
 
             if (!VALID_PATH.contains(pathWithoutQuery)) {
@@ -85,6 +84,7 @@ public class ClientHandler implements Runnable {
         }
     }
 
+    // параметры из Query String, согласно документации возвращает List<NameValuePair>
     private static List<NameValuePair> getQueryParams(String uri) throws URISyntaxException {
         return URLEncodedUtils.parse(new URI(uri), StandardCharsets.UTF_8);
     }
