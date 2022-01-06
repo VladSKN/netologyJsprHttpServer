@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,16 +37,19 @@ public class ClientHandler implements Runnable {
             // must be in form GET /path HTTP/1.1
             final var requestLine = in.readLine();
             final var parts = requestLine.split(" ");
+            final var path = parts[1];
+            final var queryParam = getQueryParams(parts[1]);
+
+            // доработка функциональности поиска handler'а так, чтобы учитывался только путь без Query
+            URL url = new URL("https://example.com".concat(path));
+            final var pathWithoutQuery = url.getPath();
 
             if (parts.length != 3) {
                 // just close socket
                 return;
             }
 
-            // доработка функциональности поиска handler'а так, чтобы учитывался только путь без Query
-            final var pathWithoutQuery = parts[1].substring(0, parts[1].indexOf("?"));
-
-            System.out.println(getQueryParams(parts[1]));
+            System.out.println(queryParam);
 
             if (!VALID_PATH.contains(pathWithoutQuery)) {
                 out.write(errorMessage().getBytes());
@@ -57,7 +61,7 @@ public class ClientHandler implements Runnable {
             final var mimeType = Files.probeContentType(filePath);
 
             // special case for classic
-            if (pathWithoutQuery.equals("/classic.html".substring(0, parts[1].indexOf("?")))) {
+            if (pathWithoutQuery.equals("/classic.html")) {
                 final var template = Files.readString(filePath);
                 final var content = template.replace(
                         "{time}",
@@ -79,7 +83,7 @@ public class ClientHandler implements Runnable {
             out.write(okMassage(mimeType, length).getBytes());
             Files.copy(filePath, out);
             out.flush();
-        } catch (IOException | URISyntaxException e) {
+        } catch (URISyntaxException | IOException e) {
             e.printStackTrace();
         }
     }
