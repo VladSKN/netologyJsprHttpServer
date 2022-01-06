@@ -38,7 +38,7 @@ public class ClientHandler implements Runnable {
             final var requestLine = in.readLine();
             final var parts = requestLine.split(" ");
             final var path = parts[1];
-            final var queryParam = getQueryParams(parts[1]);
+            final var queryParam = getQueryParams(path);
 
             // доработка функциональности поиска handler'а так, чтобы учитывался только путь без Query
             URL url = new URL("https://example.com".concat(path));
