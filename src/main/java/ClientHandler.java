@@ -23,7 +23,7 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        try (
+        try ( 
                 socket;
                 final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 final var out = new BufferedOutputStream(socket.getOutputStream());
