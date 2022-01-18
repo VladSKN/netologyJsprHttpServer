@@ -48,7 +48,7 @@ public class Request {
 
     // доработка функциональности поиска handler'а так, чтобы учитывался только путь без Query
     public String getPathWithoutQuery() {
-        int q = getPath().lastIndexOf('?');
-        return getPath().substring(0, q);
+        int indexPath = getPath().lastIndexOf('?');
+        return getPath().substring(0, indexPath);
     }
 }
