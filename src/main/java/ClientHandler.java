@@ -23,7 +23,7 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        try ( 
+        try (
                 socket;
                 final var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 final var out = new BufferedOutputStream(socket.getOutputStream());
@@ -37,7 +37,7 @@ public class ClientHandler implements Runnable {
             }
 
             System.out.println(request.getQueryParams());
-            System.out.println(request.getQueryParam("value"));
+            System.out.println(request.getQueryParam("id"));
 
             if (!VALID_PATH.contains(request.getPathWithoutQuery())) {
                 out.write(errorMessage().getBytes());
