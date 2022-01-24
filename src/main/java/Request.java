@@ -19,7 +19,6 @@ public class Request {
 
     private void init(BufferedReader bufferedReader) throws IOException, URISyntaxException {
         String requestLine = bufferedReader.readLine();
-        System.out.println(bufferedReader.read());
         parts = requestLine.split(" ");
         getQueryParams();
     }
