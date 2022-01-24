@@ -11,14 +11,16 @@ import java.util.List;
 
 public class Request {
     private String[] parts;
+    private List<NameValuePair> nameValuePairList;
 
-    public Request(BufferedReader bufferedReader) throws IOException {
+    public Request(BufferedReader bufferedReader) throws IOException, URISyntaxException {
         init(bufferedReader);
     }
 
-    private void init(BufferedReader bufferedReader) throws IOException {
+    private void init(BufferedReader bufferedReader) throws IOException, URISyntaxException {
         String requestLine = bufferedReader.readLine();
         parts = requestLine.split(" ");
+        getQueryParams();
     }
 
     private String getPath() {
@@ -26,13 +28,16 @@ public class Request {
     }
 
     // параметры из Query String, согласно документации возвращает List<NameValuePair>
-    public List<NameValuePair> getQueryParams() throws URISyntaxException {
-        return URLEncodedUtils.parse(new URI(getPath()), StandardCharsets.UTF_8);
+    private void getQueryParams() throws URISyntaxException {
+        nameValuePairList = URLEncodedUtils.parse(new URI(getPath()), StandardCharsets.UTF_8);
+    }
+
+    public List<NameValuePair> getQueryParams1()  {
+        return nameValuePairList;
     }
 
     // поиск значения по ключу name
-    public List<String> getQueryParam(String name) throws URISyntaxException {
-        List<NameValuePair> nameValuePairList = URLEncodedUtils.parse(new URI(getPath()), StandardCharsets.UTF_8);
+    public List<String> getQueryParam(String name)  {
         List<String> queryParamList = new ArrayList<>();
         for (NameValuePair nameValuePair : nameValuePairList) {
             if (nameValuePair.getName().equals(name)) {

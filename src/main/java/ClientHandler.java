@@ -31,13 +31,13 @@ public class ClientHandler implements Runnable {
 
             final var request = new Request(in);
 
+            System.out.println(request.getQueryParams1());
+            System.out.println(request.getQueryParam("id"));
+
             if (request.getParts().length != 3) {
                 // just close socket
                 return;
             }
-
-            System.out.println(request.getQueryParams());
-            System.out.println(request.getQueryParam("id"));
 
             if (!VALID_PATH.contains(request.getPathWithoutQuery())) {
                 out.write(errorMessage().getBytes());
