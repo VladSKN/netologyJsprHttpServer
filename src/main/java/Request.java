@@ -25,7 +25,6 @@ public class Request {
         return parts[1];
     }
 
-
     // параметры из Query String, согласно документации возвращает List<NameValuePair>
     public List<NameValuePair> getQueryParams() throws URISyntaxException {
         return URLEncodedUtils.parse(new URI(getPath()), StandardCharsets.UTF_8);
