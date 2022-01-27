@@ -32,12 +32,12 @@ public class Request {
         nameValuePairList = URLEncodedUtils.parse(new URI(getPath()), StandardCharsets.UTF_8);
     }
 
-    public List<NameValuePair> getQueryParams1()  {
+    public List<NameValuePair> getQueryParams1() {
         return nameValuePairList;
     }
 
     // поиск значения по ключу name
-    public List<String> getQueryParam(String name)  {
+    public List<String> getQueryParam(String name) {
         List<String> queryParamList = new ArrayList<>();
         for (NameValuePair nameValuePair : nameValuePairList) {
             if (nameValuePair.getName().equals(name)) {
@@ -54,6 +54,9 @@ public class Request {
     // доработка функциональности поиска handler'а так, чтобы учитывался только путь без Query
     public String getPathWithoutQuery() {
         int indexPath = getPath().lastIndexOf('?');
+        if (indexPath == -1){
+            return getPath();
+        }
         return getPath().substring(0, indexPath);
     }
 }
