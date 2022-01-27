@@ -20,7 +20,7 @@ public class Request {
     private void init(BufferedReader bufferedReader) throws IOException, URISyntaxException {
         String requestLine = bufferedReader.readLine();
         parts = requestLine.split(" ");
-        getQueryParams();
+        getQueryParamsInternal();
     }
 
     private String getPath() {
@@ -28,11 +28,11 @@ public class Request {
     }
 
     // параметры из Query String, согласно документации возвращает List<NameValuePair>
-    private void getQueryParams() throws URISyntaxException {
+    private void getQueryParamsInternal() throws URISyntaxException {
         nameValuePairList = URLEncodedUtils.parse(new URI(getPath()), StandardCharsets.UTF_8);
     }
 
-    public List<NameValuePair> getQueryParams1() {
+    public List<NameValuePair> getQueryParams() {
         return nameValuePairList;
     }
 
